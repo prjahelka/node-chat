@@ -24,12 +24,14 @@ io.on('connection', (socket) => {
         'System',
         'New user has joined'));
 
-    socket.on('createMessage', (chat) => {
+    socket.on('createMessage', (chat, callback) => {
         console.log('chat message: ', chat);
 
         socket.broadcast.emit('newMessage', generateMessage(
             chat.from,
             chat.text));
+
+        callback('server callback');
     });
 
     socket.on('disconnect', () => {
@@ -39,7 +41,7 @@ io.on('connection', (socket) => {
 });
 
 
-console.log('publicPath: ', publicPath);
+// console.log('publicPath: ', publicPath);
 
 server.listen(PORT, () => {
     console.log('app is running on port: ', PORT);
