@@ -9,21 +9,46 @@ socket.on('disconnect', () => {
 });
 
 socket.on('newMessage', (chatMessage) => {
-    console.log('chatMessage: ', chatMessage);
     var li = jQuery('<li></li>');
-    li.text(`${chatMessage.from} ${chatMessage.text}`);
+    li.text(`${chatMessage.from}: ${chatMessage.text}`);
+    jQuery('#messages').append(li);
+});
+
+socket.on('newLocationMessage', (locMsg) => {
+    var li = jQuery('<li></li>');
+    var a = jQuery('<a target="_blank">My Current Location</a>');
+    li.text(`${locMsg.from}: `);
+    a.attr('href', locMsg.url);
+    li.append(a);
     jQuery('#messages').append(li);
 });
 
 jQuery('#message-form').on('submit', function(evt) {
     evt.preventDefault();
     console.log('send pressed');
-    console.log('message: ', jQuery('[name=message]').val());
+    console.log('message: ', jQuery('#message').val());
     socket.emit('createMessage', {
             from: 'Pete',
-            text: jQuery('[name=message]').val()
+            text: jQuery('#message').val()
         },
         function(data) {
             console.log('message received-ack: ', data)
         });
+});
+
+var sendLocationButton = jQuery('#send-location');
+sendLocationButton.on('click', function() {
+    if (!navigator.geolocation) {
+        return alert('Geolocation not supported by this browser');
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+        console.log('position: ', position);
+        socket.emit('createLocationMessage', {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+        });
+    }, function() {
+        alert('Unable to find location');
+    });
 });

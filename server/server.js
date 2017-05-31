@@ -3,7 +3,9 @@ const http = require('http');
 const socketIO = require('socket.io');
 const path = require('path');
 
-const { generateMessage } = require('./utils/message.js');
+const { generateMessage, generateLocationMessage } =
+require('./utils/message.js');
+
 const publicPath = path.join(__dirname, '../public');
 
 const PORT = process.env.PORT || 3000;
@@ -38,8 +40,12 @@ io.on('connection', (socket) => {
         console.log('user connection lost');
     });
 
-});
+    socket.on('createLocationMessage', (position, callback) => {
+        io.emit('newLocationMessage', generateLocationMessage(
+            'Admin', position.latitude, position.longitude));
+    });
 
+});
 
 // console.log('publicPath: ', publicPath);
 
