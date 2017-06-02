@@ -8,6 +8,25 @@ socket.on('disconnect', () => {
     console.log('connecction lost');
 });
 
+function scrollToBottom() {
+    var msgs = jQuery('#messages');
+    var newMsg = msgs.children('li:last-child');
+    var cliHt = msgs.prop('clientHeight');
+    var scrlTop = msgs.prop('scrollTop');
+    var scrlHt = msgs.prop('scrollHeight');
+    var newMsgHt = newMsg.innerHeight();
+    var lastMsgHt = newMsg.prev().innerHeight();
+
+    if (cliHt + scrlTop + newMsgHt + lastMsgHt >= scrlHt) {
+        console.log('should scroll clh, stop, sht, newMsgHt, lastMsgHt: ',
+            cliHt, scrlTop, scrlHt, newMsgHt, lastMsgHt);
+        msgs.scrollTop(scrlHt);
+    } else {
+        console.log('should not scroll clh, stop, sht, newMsgHt, lastMsgHt: ',
+            cliHt, scrlTop, scrlHt, newMsgHt, lastMsgHt);
+    }
+};
+
 socket.on('newMessage', (msg) => {
     var formattedTime = moment(msg.createdAt).format('h:mm a');
     var template = jQuery('#message-template').html();
@@ -17,6 +36,7 @@ socket.on('newMessage', (msg) => {
         createdAt: formattedTime
     });
     jQuery('#messages').append(snippet);
+    scrollToBottom();
 });
 
 socket.on('newLocationMessage', (msg) => {
@@ -29,6 +49,7 @@ socket.on('newLocationMessage', (msg) => {
         createdAt: formattedTime
     });
     jQuery('#messages').append(snippet);
+    scrollToBottom();
 });
 
 jQuery('#message-form').on('submit', function(evt) {
