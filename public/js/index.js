@@ -8,21 +8,27 @@ socket.on('disconnect', () => {
     console.log('connecction lost');
 });
 
-socket.on('newMessage', (chatMessage) => {
-    var formattedTime = moment(chatMessage.createdAt).format('h:mm a');;
-    var li = jQuery('<li></li>');
-    li.text(`${chatMessage.from} ${formattedTime}: ${chatMessage.text}`);
-    jQuery('#messages').append(li);
+socket.on('newMessage', (msg) => {
+    var formattedTime = moment(msg.createdAt).format('h:mm a');
+    var template = jQuery('#message-template').html();
+    var snippet = Mustache.render(template, {
+        text: msg.text,
+        from: msg.from,
+        createdAt: formattedTime
+    });
+    jQuery('#messages').append(snippet);
 });
 
-socket.on('newLocationMessage', (locMsg) => {
-    var formattedTime = moment(locMsg.createdAt).format('h:mm a');;
-    var li = jQuery('<li></li>');
-    var a = jQuery('<a target="_blank">My Current Location</a>');
-    li.text(`${locMsg.from} ${formattedTime}: `);
-    a.attr('href', locMsg.url);
-    li.append(a);
-    jQuery('#messages').append(li);
+socket.on('newLocationMessage', (msg) => {
+    var formattedTime = moment(msg.createdAt).format('h:mm a');
+    var template = jQuery('#location-message-template').html();
+    var snippet = Mustache.render(template, {
+        text: msg.text,
+        from: msg.from,
+        mapurl: msg.url,
+        createdAt: formattedTime
+    });
+    jQuery('#messages').append(snippet);
 });
 
 jQuery('#message-form').on('submit', function(evt) {
