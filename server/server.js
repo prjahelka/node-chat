@@ -5,6 +5,8 @@ const path = require('path');
 
 const { generateMessage, generateLocationMessage } =
 require('./utils/message.js');
+const { isRealString } =
+require('./utils/validation.js');
 
 const publicPath = path.join(__dirname, '../public');
 
@@ -21,6 +23,14 @@ io.on('connection', (socket) => {
     socket.emit('newMessage', generateMessage(
         'System',
         'Welcome to the chat app'));
+
+    socket.on('join', (params, callback) => {
+        if (!isRealString(params.name) || !isRealString(params.room)) {
+            callback('Name and Room name are required');
+        }
+
+        callback();
+    });
 
     socket.broadcast.emit('newMessage', generateMessage(
         'System',
