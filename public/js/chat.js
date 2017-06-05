@@ -13,6 +13,15 @@ socket.on('connect', () => {
     });
 });
 
+socket.on('updateUserList', (users) => {
+    var ol = jQuery('<ol></ol>');
+    users.forEach(function(user) {
+        ol.append(jQuery('<li></li>').text(user));
+    });
+
+    jQuery('#users').html(ol);
+})
+
 socket.on('disconnect', () => {
     console.log('connecction lost');
 });
