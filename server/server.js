@@ -49,12 +49,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('createMessage', (chat, callback) => {
-        console.log('chat message: ', chat);
-
-        socket.broadcast.emit('newMessage', generateMessage(
-            chat.from,
-            chat.text));
-
+        var user = users.getUser(socket.id);
+        if (user && isRealString(chat.text)) {
+            io.to(user.room).emit('newMessage', generateMessage(
+                user.name,
+                chat.text));
+        }
         callback('server callback');
     });
 
@@ -71,8 +71,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('createLocationMessage', (position, callback) => {
-        io.emit('newLocationMessage', generateLocationMessage(
-            'Admin', position.latitude, position.longitude));
+        var user = users.getUser(socket.id);
+        if (user) {
+            io.to(user.room).emit('newLocationMessage', generateLocationMessage(
+                user.name,
+                position.latitude, position.longitude));
+        }
     });
 
 });
